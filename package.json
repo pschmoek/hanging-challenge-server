@@ -1,0 +1,17 @@
+{
+  "name": "hanging-challenge-backend",
+  "version": "0.0.1",
+  "description": "Backend application written in JavaScript for Hanging Challenge.",
+  "main": "index.js",
+  "repository": "https://github.com/pschmoek/hanging-challenge",
+  "author": "Philip Schmökel",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": ">=9.0.0"
+  },
+  "dependencies": {
+    "hapi": "^17.1.1",
+    "jsonwebtoken": "^8.1.0"
+  }
+}
