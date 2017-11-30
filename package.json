@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Backend application written in JavaScript for Hanging Challenge.",
   "main": "index.js",
-  "repository": "https://github.com/pschmoek/hanging-challenge",
+  "repository": "https://github.com/pschmoek/hanging-challenge-backend",
   "author": "Philip Schmökel",
   "license": "MIT",
   "private": true,
