@@ -72,7 +72,7 @@ app.get('/api/hangs', async (req, res) => {
 });
 
 app.post('/api/hangs', async (req, res) => {
-  const newHang = await Hang.addHang(req.body.date, req.body.seconds, req.decoded);
+  const newHang = await Hang.addHang(req.body.start, req.body.end, req.decoded);
   res.status(201).json(newHang);
 });
 

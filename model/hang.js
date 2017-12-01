@@ -4,15 +4,15 @@ module.exports = {
 
   /**
    * Adds a new hang
-   * @param {string} date iso date - e.g. 2017-01-05
-   * @param {number} seconds hang duration in seconds
+   * @param {string} start iso date time
+   * @param {string} end iso date time
    * @param {number} userId user id
    */
-  async addHang(date, seconds, userId) {
+  async addHang(start, end, userId) {
     const created = await pg('hang').insert({
       hanging_user_id: userId,
-      iso_date: date,
-      seconds: seconds
+      start,
+      end
     }).returning('id');
 
     return created[0];
