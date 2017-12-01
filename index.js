@@ -6,6 +6,7 @@ const FB = require('fb');
 const app = express();
 
 const secret = 'aösdfkjsadölkfjsadfölk';
+const user = require('./model/user');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -18,14 +19,24 @@ app.post('/api/auth', async (req, res) => {
   if (!accessToken) {
     res.status(401).json({ message: 'No token provided.' });
   } else {
-    FB.api('/me', { fields: 'id', access_token: accessToken }, response => {
+    FB.api('/me', { fields: 'id', access_token: accessToken }, async response => {
       if (!response.id) {
         res.status(401).json({ message: 'Invalid token provided.' });
       } else {
-        // TODO Look up user.
-        const token = jwt.sign(response.id, secret);
-        res.json({
-          jwt: token
+        const userId = await user.getUserId(response.id);
+        if (userId) {
+          const token = jwt.sign(userId, secret);
+          return res.json({ jwt: token });
+        }
+
+        FB.api('/me', { fields: 'id,first_name', access_token: accessToken }, async response => {
+          const createdUserId = await user.addUser({
+            fbId: response.id,
+            firstName: response.first_name
+          });
+
+          const token = jwt.sign(createdUserId, secret);
+          return res.json({ jwt: token });
         });
       }
     });
