@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "Backend application written in JavaScript for Hanging Challenge.",
   "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
   "repository": "https://github.com/pschmoek/hanging-challenge-backend",
   "author": "Philip Schmökel",
   "license": "MIT",
@@ -11,7 +14,13 @@
     "node": ">=9.0.0"
   },
   "dependencies": {
-    "hapi": "^17.1.1",
-    "jsonwebtoken": "^8.1.0"
+    "express": "^4.16.2",
+    "express-bearer-token": "^2.1.0",
+    "fb": "^2.0.0",
+    "jsonwebtoken": "^8.1.0",
+    "morgan": "^1.9.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.12.1"
   }
 }
