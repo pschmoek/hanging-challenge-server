@@ -7,18 +7,18 @@ module.exports = {
    * @param {number} id User Id
    */
   async getUserById(id) {
-    return await pg('hanging_user').where({
+    return await pg('app_user').where({
       id: id
     }).first('*');
   },
 
   /**
    * Gets a user by Facebook id
-   * @param {number} id Facebook User Id
+   * @param {string} facebookId Facebook User Id
    */
-  async getUser(id) {
-    return await pg('hanging_user').where({
-      fb_id: id
+  async getUser(facebookId) {
+    return await pg('app_user').where({
+      fb_id: facebookId
     }).first('*');
   },
 
@@ -27,7 +27,7 @@ module.exports = {
    * @param {Object} user User to be saved
    */
   async addUser(user) {
-    const created = await pg('hanging_user').insert({
+    const created = await pg('app_user').insert({
       fb_id: user.fbId,
       first_name: user.firstName,
     }).returning('id');
