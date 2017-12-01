@@ -3,15 +3,23 @@ const pg = require('./knex');
 module.exports = {
 
   /**
-   * Gets a user
+   * Gets a user by id
+   * @param {number} id User Id
+   */
+  async getUserById(id) {
+    return await pg('hanging_user').where({
+      id: id
+    }).first('*');
+  },
+
+  /**
+   * Gets a user by Facebook id
    * @param {number} id Facebook User Id
    */
-  async getUserId(id) {
-    const user = await pg('hanging_user').where({
+  async getUser(id) {
+    return await pg('hanging_user').where({
       fb_id: id
-    }).first('id');
-
-    return user ? user.id : null;
+    }).first('*');
   },
 
   /**

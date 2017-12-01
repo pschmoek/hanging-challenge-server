@@ -23,9 +23,9 @@ app.post('/api/auth', async (req, res) => {
       if (!response.id) {
         res.status(401).json({ message: 'Invalid token provided.' });
       } else {
-        const userId = await user.getUserId(response.id);
-        if (userId) {
-          const token = jwt.sign(userId, secret);
+        const lookedUpUser = await user.getUser(response.id);
+        if (lookedUpUser && lookedUpUser.id) {
+          const token = jwt.sign(lookedUpUser.id, secret);
           return res.json({ jwt: token });
         }
 
@@ -59,8 +59,9 @@ app.use((req, res, next) => {
 });
 
 app.get('/api/user', async (req, res) => {
+  const lookedUpUser = await user.getUserById(req.decoded);
   res.json({
-    userName: 'Otto'
+    userName: lookedUpUser.first_name
   });
 });
 
