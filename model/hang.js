@@ -10,10 +10,10 @@ module.exports = {
    */
   async addHang(start, end, userId) {
     const created = await pg('hang').insert({
-      hanging_user_id: userId,
+      app_user_id: userId,
       start,
       end
-    }).returning('id');
+    }).returning(['id', 'start', 'end']);
 
     return created[0];
   },
