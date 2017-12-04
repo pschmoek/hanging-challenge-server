@@ -24,6 +24,20 @@ module.exports = {
    */
   async getAll(userId) {
     return await pg('hang').where({ app_user_id: userId }).select('*');
+  },
+
+  /**
+   * Gets all hangs for a given user and date
+   * @param {number} userId User id
+   * @param {string} date Iso date (e.g. 2017-01-01)
+   */
+  async getByDate(userId, date) {
+    const hangs = await pg('hang').where({  app_user_id: userId }).andWhere('start', 'like', date + '%').select('*');
+    return hangs.map(h => ({
+      id: h.id,
+      start: h.start,
+      end: h.end
+    }));
   }
 
 }
