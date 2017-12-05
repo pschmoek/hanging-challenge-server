@@ -81,7 +81,7 @@ app.post('/api/hangs', async (req, res) => {
     const savePromises = req.body.hangs.map(h => Hang.addHang(h.start, h.end, req.decoded));
     const newHangs = await Promise.all(savePromises);
 
-    res.status(201).json(newHangs);
+    return res.status(201).json(newHangs);
   }
 
   res.status(400).json({ message: 'Bad format.' });
