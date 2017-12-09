@@ -89,5 +89,5 @@ app.post('/api/hangs', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.info('running on' + PORT);
+  console.info('running on ' + PORT);
 });
