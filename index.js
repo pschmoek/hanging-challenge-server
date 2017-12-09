@@ -5,7 +5,7 @@ const bearerToken = require('express-bearer-token');
 const FB = require('fb');
 const app = express();
 
-const SECRET = process.env.SECRET || 'aösdfkjsadölkfjsadfölk';
+const SECRET = process.env.SECRET || 'hanging-challenge-test-secret';
 const AppUser = require('./model/app-user');
 const Hang = require('./model/hang');
 const PORT = process.env.PORT || 3000;
@@ -19,45 +19,41 @@ app.use(morgan('tiny'));
 app.post('/auth', async (req, res) => {
   const accessToken = req.body.fbAccessToken;
   if (!accessToken) {
-    res.status(401).json({ message: 'No token provided.' });
-  } else {
-    FB.api('/me', { fields: 'id', access_token: accessToken }, async response => {
-      if (!response.id) {
-        res.status(401).json({ message: 'Invalid token provided.' });
-      } else {
-        const lookedUpUser = await AppUser.getUser(response.id);
-        if (lookedUpUser && lookedUpUser.id) {
-          const token = jwt.sign(lookedUpUser.id, SECRET);
-          return res.json({ jwt: token });
-        }
-
-        FB.api('/me', { fields: 'id,first_name', access_token: accessToken }, async response => {
-          const createdUserId = await AppUser.addUser({
-            fbId: response.id,
-            firstName: response.first_name
-          });
-
-          const token = jwt.sign(createdUserId, SECRET);
-          return res.json({ jwt: token });
-        });
-      }
-    });
+    return res.status(400).send('No facebook token provided.');
   }
+
+  FB.api('/me', { fields: 'id,first_name', access_token: accessToken }, async response => {
+    if (!response.id) {
+      return res.sendStatus(401);
+    }
+
+    const lookedUpUser = await AppUser.getUser(response.id);
+    if (lookedUpUser && lookedUpUser.id) {
+      const token = jwt.sign(lookedUpUser.id, SECRET);
+      return res.json({ jwt: token });
+    }
+
+    const newUser = { fbId: response.id, firstName: response.first_name };
+    const createdUserId = await AppUser.addUser(newUser);
+    const token = jwt.sign(createdUserId, SECRET);
+
+    return res.json({ jwt: token });
+  });
 });
 
 app.use((req, res, next) => {
-  if (req.token) {
-    jwt.verify(req.token, SECRET, function(err, decoded) {      
-      if (err) {
-        res.status(403).json({ message: 'Failed to authenticate token.' });    
-      } else {
-        req.decoded = decoded;    
-        next();
-      }
-    });
-  } else {
-    res.status(401).json({ message: 'No token provided.' });
+  if (!req.token) {
+    return res.sendStatus(401);
   }
+
+  jwt.verify(req.token, SECRET, function(err, decoded) {      
+    if (err) {
+      return res.sendStatus(401);
+    }
+
+    req.decoded = decoded;    
+    next();
+  });
 });
 
 app.get('/user', async (req, res) => {
@@ -85,7 +81,7 @@ app.post('/hangs', async (req, res) => {
     return res.status(201).json(newHangs);
   }
 
-  res.status(400).json({ message: 'Bad format.' });
+  res.sendStatus(400);
 });
 
 app.listen(PORT, () => {
