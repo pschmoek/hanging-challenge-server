@@ -17,6 +17,7 @@
     "express": "^4.16.2",
     "express-bearer-token": "^2.1.0",
     "fb": "^2.0.0",
+    "helmet": "^3.9.0",
     "jsonwebtoken": "^8.1.0",
     "knex": "^0.14.2",
     "morgan": "^1.9.0",

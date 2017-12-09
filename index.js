@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const bearerToken = require('express-bearer-token');
 const FB = require('fb');
 const app = express();
+const helmet = require('helmet');
 
 const SECRET = process.env.SECRET || 'hanging-challenge-test-secret';
 const AppUser = require('./model/app-user');
@@ -12,6 +13,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(helmet());
 app.use(bearerToken());
 
 app.use(morgan('tiny'));
