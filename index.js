@@ -8,6 +8,7 @@ const app = express();
 const secret = 'aösdfkjsadölkfjsadfölk';
 const AppUser = require('./model/app-user');
 const Hang = require('./model/hang');
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -87,6 +88,6 @@ app.post('/api/hangs', async (req, res) => {
   res.status(400).json({ message: 'Bad format.' });
 });
 
-app.listen(4201, () => {
-  console.log('running on 4201 ...');
+app.listen(PORT, () => {
+  console.info('running on' + PORT);
 });
