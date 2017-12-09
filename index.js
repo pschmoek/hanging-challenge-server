@@ -5,7 +5,7 @@ const bearerToken = require('express-bearer-token');
 const FB = require('fb');
 const app = express();
 
-const secret = 'aösdfkjsadölkfjsadfölk';
+const SECRET = process.env.SECRET || 'aösdfkjsadölkfjsadfölk';
 const AppUser = require('./model/app-user');
 const Hang = require('./model/hang');
 const PORT = process.env.PORT || 3000;
@@ -27,7 +27,7 @@ app.post('/auth', async (req, res) => {
       } else {
         const lookedUpUser = await AppUser.getUser(response.id);
         if (lookedUpUser && lookedUpUser.id) {
-          const token = jwt.sign(lookedUpUser.id, secret);
+          const token = jwt.sign(lookedUpUser.id, SECRET);
           return res.json({ jwt: token });
         }
 
@@ -37,7 +37,7 @@ app.post('/auth', async (req, res) => {
             firstName: response.first_name
           });
 
-          const token = jwt.sign(createdUserId, secret);
+          const token = jwt.sign(createdUserId, SECRET);
           return res.json({ jwt: token });
         });
       }
@@ -47,7 +47,7 @@ app.post('/auth', async (req, res) => {
 
 app.use((req, res, next) => {
   if (req.token) {
-    jwt.verify(req.token, secret, function(err, decoded) {      
+    jwt.verify(req.token, SECRET, function(err, decoded) {      
       if (err) {
         res.status(403).json({ message: 'Failed to authenticate token.' });    
       } else {
