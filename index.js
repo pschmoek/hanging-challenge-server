@@ -16,7 +16,7 @@ app.use(bearerToken());
 
 app.use(morgan('tiny'));
 
-app.post('/api/auth', async (req, res) => {
+app.post('/auth', async (req, res) => {
   const accessToken = req.body.fbAccessToken;
   if (!accessToken) {
     res.status(401).json({ message: 'No token provided.' });
@@ -60,24 +60,24 @@ app.use((req, res, next) => {
   }
 });
 
-app.get('/api/user', async (req, res) => {
+app.get('/user', async (req, res) => {
   const lookedUpUser = await AppUser.getUserById(req.decoded);
   res.json({
     userName: lookedUpUser.first_name
   });
 });
 
-app.get('/api/hangs', async (req, res) => {
+app.get('/hangs', async (req, res) => {
   const hangs = await Hang.getAll(req.decoded);
   res.json(hangs);
 });
 
-app.get('/api/hangs/:date', async (req, res) => {
+app.get('/hangs/:date', async (req, res) => {
   const hangs = await Hang.getByDate(req.decoded, req.params.date);
   res.json(hangs);
 });
 
-app.post('/api/hangs', async (req, res) => {
+app.post('/hangs', async (req, res) => {
   if (Array.isArray(req.body.hangs)) {
     const savePromises = req.body.hangs.map(h => Hang.addHang(h.start, h.end, req.decoded));
     const newHangs = await Promise.all(savePromises);
