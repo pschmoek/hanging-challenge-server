@@ -2,13 +2,13 @@ const express = require('express');
 const morgan = require('morgan');
 const jwt = require('jsonwebtoken');
 const bearerToken = require('express-bearer-token');
-const FB = require('fb');
 const app = express();
 const helmet = require('helmet');
 
 const SECRET = process.env.SECRET || 'hanging-challenge-test-secret';
 const AppUser = require('./model/app-user');
 const Hang = require('./model/hang');
+const Facebook = require('./model/facebook');
 const PORT = process.env.PORT || 3000;
 
 app.use(helmet());
@@ -18,28 +18,23 @@ app.use(express.urlencoded({ extended: false }));
 app.use(bearerToken());
 
 app.post('/auth', async (req, res) => {
-  const accessToken = req.body.fbAccessToken;
-  if (!accessToken) {
+  if (!req.body.fbAccessToken) {
     return res.status(400).send('No facebook token provided.');
   }
 
-  FB.api('/me', { fields: 'id,first_name', access_token: accessToken }, async response => {
-    if (!response.id) {
-      return res.sendStatus(401);
-    }
-
-    const lookedUpUser = await AppUser.getUser(response.id);
+  try {
+    const facebookUser = await Facebook.getUserInfo(req.body.fbAccessToken);
+    const lookedUpUser = await AppUser.getUserByFacebookId(facebookUser.facebookId);
     if (lookedUpUser && lookedUpUser.id) {
-      const token = jwt.sign(lookedUpUser.id, SECRET);
-      return res.json({ jwt: token });
+      res.json({ jwt: jwt.sign(lookedUpUser.id, SECRET) });
+    } else {
+      const createdUserId = await AppUser.createUser(facebookUser);
+      res.json({ jwt: jwt.sign(createdUserId, SECRET) });
     }
-
-    const newUser = { fbId: response.id, firstName: response.first_name };
-    const createdUserId = await AppUser.addUser(newUser);
-    const token = jwt.sign(createdUserId, SECRET);
-
-    return res.json({ jwt: token });
-  });
+  } catch(e) {
+    console.error(e);
+    res.sendStatus(401);
+  }
 });
 
 app.use((req, res, next) => {
