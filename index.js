@@ -11,12 +11,11 @@ const AppUser = require('./model/app-user');
 const Hang = require('./model/hang');
 const PORT = process.env.PORT || 3000;
 
+app.use(helmet());
+app.use(morgan('tiny'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(helmet());
 app.use(bearerToken());
-
-app.use(morgan('tiny'));
 
 app.post('/auth', async (req, res) => {
   const accessToken = req.body.fbAccessToken;
