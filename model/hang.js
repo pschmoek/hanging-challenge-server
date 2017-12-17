@@ -30,7 +30,7 @@ async function getAll(userId) {
  * @param {string} date Iso date (e.g. 2017-01-01)
  */
 async function getByDate(userId, date) {
-  const hangs = await pg('hang').where({  app_user_id: userId }).andWhere('start', 'like', date + '%').select('*');
+  const hangs = await pg('hang').where({ app_user_id: userId }).andWhere('start', 'like', date + '%').select('*');
   return hangs.map(h => ({
     id: h.id,
     start: h.start,
