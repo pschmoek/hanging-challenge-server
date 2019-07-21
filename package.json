@@ -4,7 +4,8 @@
   "description": "Backend application written in JavaScript for Hanging Challenge.",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "start:windows": "SET \"NODE_ENV=windows\" && yarn start"
   },
   "repository": "https://github.com/pschmoek/hanging-challenge-backend",
   "author": "Philip Schmökel",
