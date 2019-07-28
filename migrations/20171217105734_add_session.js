@@ -57,8 +57,10 @@ exports.up = function(knex, Promise) {
       }
     
       // last current var
-      sessions.push(current);
-    
+      if (current != null) {
+        sessions.push(current);
+      }
+
       for (const session of sessions) {
         let newSession = (await knex('hang_session')
           .returning('*')

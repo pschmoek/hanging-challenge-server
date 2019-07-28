@@ -2,7 +2,7 @@ const pg = require('./knex');
 
 async function getSessions(userId, date) {
   const queryResult = await pg('hang_session')
-    .leftJoin('hang', 'hang_session.id', 'hang.hang_session_id')
+    .join('hang', 'hang_session.id', 'hang.hang_session_id')
     .where({
       app_user_id: userId,
       date: date
@@ -14,7 +14,7 @@ async function getSessions(userId, date) {
       'hang.start',
       'hang.end');
 
-  const sessionIds = queryResult.reduce((pre, cur) => ({...pre, [cur.session_id]: {...cur}}), {});
+  const sessionIds = queryResult.reduce((pre, cur) => ({ ...pre, [cur.session_id]: { ...cur } }), {});
   const result = [];
   for (const sessionId of Object.keys(sessionIds)) {
     let sessionsHangs = queryResult.filter(r => +r.session_id === +sessionId);
@@ -30,7 +30,33 @@ async function getSessions(userId, date) {
 }
 
 async function addSession(userId, session) {
-  // TODO
+  return pg.transaction(async trx => {
+    const insertedIds = await trx
+      .insert({
+        app_user_id: userId,
+        target_time: session.targetTime,
+        rest_time: session.restTime,
+        date: session.date
+      })
+      .into('hang_session')
+      .returning('id');
+    
+    const hangSessionId = insertedIds[0];
+    const hangEntities = session.hangs.map(h => ({...h, hang_session_id: hangSessionId}))
+
+    const insertedHangs = await trx
+      .insert(hangEntities)
+      .into('hang')
+      .returning(['id', 'start', 'end']);
+
+    const savedSession = {
+      ...session,
+      id: hangSessionId,
+      hangs: insertedHangs
+    };
+
+    return savedSession;
+  })
 }
 
 module.exports = {

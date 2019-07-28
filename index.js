@@ -8,6 +8,7 @@ const helmet = require('helmet');
 const SECRET = process.env.SECRET || 'hanging-challenge-test-secret';
 const AppUser = require('./model/app-user');
 const Hang = require('./model/hang');
+const HangSession = require('./model/hang-session');
 const Facebook = require('./model/facebook');
 const PORT = process.env.PORT || 3000;
 
@@ -59,25 +60,22 @@ app.get('/user', async (req, res) => {
   });
 });
 
-app.get('/hangs', async (req, res) => {
-  const hangs = await Hang.getAll(req.decoded);
-  res.json(hangs);
-});
-
-app.get('/hangs/:date', async (req, res) => {
-  const hangs = await Hang.getByDate(req.decoded, req.params.date);
-  res.json(hangs);
-});
-
-app.post('/hangs', async (req, res) => {
-  if (Array.isArray(req.body.hangs)) {
-    const savePromises = req.body.hangs.map(h => Hang.addHang(h.start, h.end, req.decoded));
-    const newHangs = await Promise.all(savePromises);
-
-    return res.status(201).json(newHangs);
+app.get('/hang-sessions', async (req, res) => {
+  try {
+    const sessions = await HangSession.getSessions(req.decoded, req.query.date);
+    res.json(sessions);
+  } catch(error) {
+    res.status(500).send(error);
   }
+});
 
-  res.sendStatus(400);
+app.post('/hang-sessions', async (req, res) => {
+  try {
+    const newSession = await HangSession.addSession(req.decoded, req.body);
+    res.status(201).send(newSession);
+  } catch(error) {
+    res.status(500).send(error);
+  }
 });
 
 app.listen(PORT, () => {
